@@ -24,20 +24,15 @@ internal class Program
             {
                 var kline = stream.Data.Data as BinanceStreamKline;
                 var sma = new SMA();
-                var smaValue = await sma.Calculate(klineTableDef, (KlineRecord)kline!, kline!.CloseTime, SMA_LENGTH_200);
-                if (kline?.Final == false)
+
+                if (kline!.Final)
                 {
-                    // movement value
-                    Console.WriteLine($"-Open: {kline.OpenPrice}, High: {kline.HighPrice}, Low: {kline.LowPrice}, Close: {kline.ClosePrice}, Volume: {kline.Volume}");
-                    Console.WriteLine($"SMA: {smaValue}");
-                }
-                else
-                {
-                    // the last value of candle
                     klineDataAccess.SetKlines(klineTableDef, [(KlineRecord)kline!]);
-                    Console.WriteLine($"* Open: {kline!.OpenPrice}, High: {kline.HighPrice}, Low: {kline.LowPrice}, Close: {kline.ClosePrice}, Volume: {kline.Volume}");
-                    Console.WriteLine($"SMA: {smaValue}");
                 }
+
+                var smaValue = await sma.Calculate(klineTableDef, (KlineRecord)kline!, kline!.CloseTime, SMA_LENGTH_200);
+                Console.WriteLine($"Open: {kline!.OpenPrice}, High: {kline.HighPrice}, Low: {kline.LowPrice}, Close: {kline.ClosePrice}, Volume: {kline.Volume}");
+                Console.WriteLine($"SMA: {smaValue}");
             });
 
             await Task.Delay(TimeSpan.FromMinutes(30));

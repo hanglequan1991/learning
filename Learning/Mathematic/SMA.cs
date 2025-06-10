@@ -23,22 +23,18 @@ public class SMA : IDisposable
         var klines = cachedKlines.ToArray();
 
         // cannot find a cache
-        if (klines.Length == 0)
+        if (klines.Length == 0 || cachedKlines.Count < lengthToFetch)
         {
             klines = await _restApiAdapter.FetchKlines(tableDef, time.AddSeconds(-tableDef.IntervalInSec * lengthToFetch), time, lengthToFetch);
             _klineDataAccess.SetKlines(tableDef, klines);
         }
-        else if (cachedKlines.Count < lengthToFetch)
+        
+        if (klines.Length != length)
         {
-            // fetch missing klines
-            var lastKline = cachedKlines.Last();
-            var missingKlines = await _restApiAdapter.FetchKlines(tableDef, lastKline.CloseTime, time);
-            _klineDataAccess.SetKlines(tableDef, missingKlines);
-            klines = [.. klines, .. missingKlines];
+            throw new Exception("Fetch Klines length, can't calculate SMA correctly");
         }
 
         var closePrices = klines.Select(x => x.ClosePrice).ToList();
-
         return (closePrices.Select(k => Convert.ToDecimal(k)).Sum() + current.ClosePrice) / length;
     }
 
