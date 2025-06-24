@@ -18,6 +18,7 @@ public class BinanceRestApiAdapter : IDisposable
 
     public async Task<KlineRecord[]> FetchKlines(TableDefinitionRecord tableDef, DateTime? startTime = null, DateTime? endTime = null, int? limit = null)
     {
+        Console.WriteLine("Fetch Fapi");
         var klines = await _client.UsdFuturesApi.ExchangeData.GetKlinesAsync(tableDef.Symbol, (KlineInterval)tableDef.IntervalInSec, startTime, endTime, limit);
         return klines.Data.Select(k => (KlineRecord)(k as BinanceFuturesUsdtKline)!).ToArray();
     }

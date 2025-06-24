@@ -1,45 +1,26 @@
-﻿using Learning.Adapters;
-using Learning.DataAccess;
+﻿namespace Learning.Mathematic;
 
-namespace Learning.Mathematic;
-
-//https://www.investopedia.com/terms/s/sma.asp
-public class SMA : IDisposable
+/// <summary>
+/// https://www.investopedia.com/terms/s/sma.asp
+/// </summary>
+public class SMA
 {
-    readonly BinanceRestApiAdapter _restApiAdapter;
-    readonly KlineDataAccess _klineDataAccess;
+    double[] _prices;
 
-    public SMA()
+    public SMA(double[] prices, int length)
     {
-        _restApiAdapter = new BinanceRestApiAdapter();
-        _klineDataAccess = new KlineDataAccess();
+        _prices = prices[^length..];
     }
 
-    public async Task<decimal?> Calculate(TableDefinitionRecord tableDef, KlineRecord current, DateTime time, int length)
+    public double Moment(double price)
     {
-        // check on DataAccess
-        var lengthToFetch = length - 1;
-        var cachedKlines = _klineDataAccess.GetKlinesByLength(tableDef, length - 1, time);
-        var klines = cachedKlines.ToArray();
-
-        // cannot find a cache
-        if (klines.Length == 0 || cachedKlines.Count < lengthToFetch)
-        {
-            klines = await _restApiAdapter.FetchKlines(tableDef, time.AddSeconds(-tableDef.IntervalInSec * lengthToFetch), time, lengthToFetch);
-            _klineDataAccess.SetKlines(tableDef, klines);
-        }
-        
-        if (klines.Length != length)
-        {
-            throw new Exception("Fetch Klines length, can't calculate SMA correctly");
-        }
-
-        var closePrices = klines.Select(x => x.ClosePrice).ToList();
-        return (closePrices.Select(k => Convert.ToDecimal(k)).Sum() + current.ClosePrice) / length;
+        double[] prices = [.. _prices[1..], price];
+        return prices.Average();
     }
 
-    public void Dispose()
+    public double Next(double price)
     {
-        _restApiAdapter.Dispose();
+        _prices = [.. _prices[1..], price];
+        return _prices.Average();
     }
 }

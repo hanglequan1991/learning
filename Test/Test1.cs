@@ -32,13 +32,13 @@ namespace Test
                 // insert
                 var initTime = new DateTime(0);
                 var startTime = new DateTime(0);
-                for (int i = 0; i < 200; i++) 
-                { 
+                for (int i = 0; i < 200; i++)
+                {
                     var key = $"BTC_{startTime:yyyyMMddHHmmss}";
                     transaction.Insert("TestTable", key, "TestValue");
                     startTime = startTime.AddMinutes(5);
                 }
-                
+
                 transaction.Commit();
                 // get
                 var data = transaction.SelectForwardStartFrom<string, string>("TestTable", $"BTC_{initTime:yyyyMMddHHmmss}", true);
@@ -50,8 +50,16 @@ namespace Test
 
                 startKey = $"BTC_{initTime.AddMinutes(5).AddMinutes(5):yyyyMMddHHmmss}";
                 Assert.AreEqual(data.ElementAt(1).Key, startKey);
-                    
+
             }
+        }
+
+        [TestMethod]
+        public void TestArray()
+        {
+            var a = Enumerable.Repeat(0, 500).Select((int a, int index) => index).ToArray();
+            var length = 100;
+            var b = a[^(length * 2)..^(length)];
         }
     }
 }
