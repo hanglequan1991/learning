@@ -9,8 +9,6 @@ public class EMA
 
     double _ema;
 
-    double _sma;
-
     /// <summary>
     /// Weighted Multiplier = 2 / (selected time period + 1)
     /// </summary>
@@ -19,11 +17,19 @@ public class EMA
     public EMA(double[] src, int length)
     {
         _length = length;
-        _ema = src[0.._length].Average();
-
-        for (int i = _length; i < src.Length; i++)
+        if (src.Length < length)
         {
-            _ema = Next(src[i]);
+            _ema = src[0..^2].Average();
+            _ema = Next(src[^1]);
+        }
+        else
+        {
+            _ema = src[0.._length].Average();
+
+            for (int i = _length; i < src.Length; i++)
+            {
+                _ema = Next(src[i]);
+            }
         }
     }
 
