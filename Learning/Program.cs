@@ -31,7 +31,7 @@ internal class Program
             var closedPrices = klines.Data.Where(x => x.CloseTime < DateTime.UtcNow).Select(x => (double)x.ClosePrice).ToArray();
             var sma = new SMA(closedPrices, length);
             var ema = new EMA(closedPrices, 25);
-            var macd = new MACD(closedPrices, 12, 26);
+            var macd = new MACD(closedPrices, 12, 26, 9);
             var min = new MIN(closedPrices, length);
             var max = new MAX(closedPrices, length);
             var rsi = new RSI(closedPrices, 14);
@@ -58,11 +58,11 @@ internal class Program
                     }
 
                     Console.WriteLine($"Open: {kline!.OpenPrice}, High: {kline.HighPrice}, Low: {kline.LowPrice}, Close: {kline.ClosePrice}, Volume: {kline.Volume}");
-                    Console.WriteLine($"SMA: {smaValue}");
-                    Console.WriteLine($"EMA: {emaValue}");
+                  //  Console.WriteLine($"SMA: {smaValue}");
+                  //  Console.WriteLine($"EMA: {emaValue}");
                     Console.WriteLine($"MACD: {macdValue}");
-                    Console.WriteLine($"MIN: {minValue}, MAX: {maxValue}");
-                    Console.WriteLine($"RSI: {rsiValue}");
+                    // Console.WriteLine($"MIN: {minValue}, MAX: {maxValue}");
+                    // Console.WriteLine($"RSI: {rsiValue}");
                 }
                 catch (Exception ex)
                 {

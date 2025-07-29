@@ -1,6 +1,6 @@
 namespace Learning.Mathematic;
 
-public class RSI
+public class RSI : IMath
 {
     private double _rsi;
     private double[] _prices;
@@ -28,10 +28,10 @@ public class RSI
             totalLosses += change < 0 ? Math.Abs(change) : 0;
         }
 
-        var avgGain = totalGains / _length;
-        var avgLoss = totalLosses / _length;
-        
-        _rsi = 100 - (100 / (1 + (avgGain / avgLoss)));
+        _avgGain = totalGains / _length;
+        _avgLoss = totalLosses / _length;
+
+        _rsi = 100 - (100 / (1 + (_avgGain / _avgLoss)));
     }
 
     private (double AvgGain, double AvgLoss) CalculateChange(int length)
@@ -65,5 +65,10 @@ public class RSI
         var gain = change > 0 ? change : 0;
         var loss = change < 0 ? Math.Abs(change) : 0;
         return 100 - (100 / (1 + (_avgGain * (_length - 1) + gain) / (_avgLoss * (_length - 1) + loss)));
+    }
+
+    public override string ToString()
+    {
+        return $"{nameof(RSI)}: {_rsi}";
     }
 }

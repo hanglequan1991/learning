@@ -3,11 +3,11 @@ namespace Learning.Mathematic;
 /// <summary>
 /// https://www.investopedia.com/ask/answers/122314/what-exponential-moving-average-ema-formula-and-how-ema-calculated.asp
 /// </summary>
-public class EMA
+public class EMA : IMath
 {
     int _length;
 
-    double _ema;
+    double[] _emaLine;
 
     /// <summary>
     /// Weighted Multiplier = 2 / (selected time period + 1)
@@ -17,18 +17,20 @@ public class EMA
     public EMA(double[] src, int length)
     {
         _length = length;
+        _emaLine = new double[src.Length];
+        Array.Fill(_emaLine, double.NaN);
+
         if (src.Length < length)
         {
-            _ema = src[0..^2].Average();
-            _ema = Next(src[^1]);
+            _emaLine = [.. _emaLine[1..src.Length], src[0..^2].Average()];
+            Next(src[^1]);
         }
         else
         {
-            _ema = src[0.._length].Average();
-
+            _emaLine = [.. _emaLine[1..src.Length], src[0.._length].Average()];
             for (int i = _length; i < src.Length; i++)
             {
-                _ema = Next(src[i]);
+                Next(src[i]);
             }
         }
     }
@@ -44,12 +46,17 @@ public class EMA
     /// <returns></returns>
     public double Moment(double price)
     {
-        return price * k + _ema * (1 - k);
+        var ema = _emaLine[^1];
+        return price * k + ema * (1 - k);
     }
 
     public double Next(double price)
     {
-        _ema = Moment(price);
-        return _ema;
+        var ema = Moment(price);
+        _emaLine = [.. _emaLine[1.._emaLine.Length], ema];
+        return _emaLine[^1];
     }
+
+    public double[] GetLines() => [.. _emaLine];
+    public double FirstNotNaN => _emaLine.Where(_ => !double.IsNaN(_)).FirstOrDefault();
 }

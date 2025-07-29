@@ -1,7 +1,6 @@
-using System.Linq;
 namespace Learning.Mathematic;
 
-public class MIN
+public class MIN : IMath
 {
     private double[] _prices;
 

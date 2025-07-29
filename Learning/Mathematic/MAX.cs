@@ -1,7 +1,7 @@
 using System.Linq;
 namespace Learning.Mathematic;
 
-public class MAX
+public class MAX: IMath
 {
     private double[] _prices;
 
