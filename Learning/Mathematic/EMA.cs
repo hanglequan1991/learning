@@ -19,7 +19,6 @@ public class EMA : IMath
         _length = length;
         _emaLine = new double[src.Length];
         Array.Fill(_emaLine, double.NaN);
-
         if (src.Length < length)
         {
             _emaLine = [.. _emaLine[1..src.Length], src[0..^2].Average()];
@@ -27,8 +26,17 @@ public class EMA : IMath
         }
         else
         {
-            _emaLine = [.. _emaLine[1..src.Length], src[0.._length].Average()];
-            for (int i = _length; i < src.Length; i++)
+            var firstValueIndex = 0;
+            for (int i = 0; i < src.Length; i++)
+            {
+                if (!double.IsNaN(src[i]))
+                {
+                    firstValueIndex = i;
+                    break;
+                }
+            }
+            _emaLine = [.. _emaLine[1..src.Length], src[firstValueIndex..(_length + firstValueIndex)].Average()];
+            for (int i = _length + firstValueIndex; i < src.Length; i++)
             {
                 Next(src[i]);
             }

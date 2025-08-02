@@ -17,6 +17,8 @@ public class MACD
         _slowPeriod = slowPeriod;
         _signalPeriod = signalPeriod;
 
+        var max = new int[3] { _fastPeriod, _slowPeriod, _signalPeriod }.Max();
+
         _fastEMA = new EMA(source, fastPeriod);
         _slowEMA = new EMA(source, slowPeriod);
 
@@ -29,21 +31,21 @@ public class MACD
         _signalLine = new EMA(macdLines.ToArray(), signalPeriod);
     }
 
-    public  (double MACD, double DEF, double SignalLine) Next(double price)
+    public (double signal, double macd, double histogram) Next(double price)
     {
         var fastEMA = _fastEMA.Next(price);
         var slowEMA = _slowEMA.Next(price);
-        var MACD = fastEMA - slowEMA;
-        var signalLine = _signalLine.Next(MACD);
-        return (MACD, signalLine, MACD - signalLine);
+        var macd = fastEMA - slowEMA;
+        var signalLine = _signalLine.Next(macd);
+        return (signalLine, macd, macd - signalLine);
     }
 
-    public (double MACD, double DEF, double SignalLine) Moment(double price)
+    public (double signal, double macd, double histogram) Moment(double price)
     {
         var fastEMA = _fastEMA.Moment(price);
         var slowEMA = _slowEMA.Moment(price);
         var macd = fastEMA - slowEMA;
         var signalLine = _signalLine.Moment(macd);
-        return (macd, _signalLine.GetLines()[^_signalPeriod], macd - _signalLine.GetLines()[^_signalPeriod]);
+        return (signalLine, macd, macd - signalLine);
     }
 }
