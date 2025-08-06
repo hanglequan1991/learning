@@ -19,28 +19,32 @@ public class EMA : IMath
         _length = length;
         _emaLine = new double[src.Length];
         Array.Fill(_emaLine, double.NaN);
-        if (src.Length < length)
+        foreach (var price in src)
         {
-            _emaLine = [.. _emaLine[1..src.Length], src[0..^2].Average()];
-            Next(src[^1]);
+            Next(price);
         }
-        else
-        {
-            var firstValueIndex = 0;
-            for (int i = 0; i < src.Length; i++)
-            {
-                if (!double.IsNaN(src[i]))
-                {
-                    firstValueIndex = i;
-                    break;
-                }
-            }
-            _emaLine = [.. _emaLine[1..src.Length], src[firstValueIndex..(_length + firstValueIndex)].Average()];
-            for (int i = _length + firstValueIndex; i < src.Length; i++)
-            {
-                Next(src[i]);
-            }
-        }
+        // if (src.Length < length)
+        // {
+        //     _emaLine = [.. _emaLine[1..length], .. src];
+        //     //Next(src[^1]);
+        // }
+        // else
+        // {
+        //     var firstValueIndex = 0;
+        //     for (int i = 0; i < src.Length; i++)
+        //     {
+        //         if (!double.IsNaN(src[i]))
+        //         {
+        //             firstValueIndex = i;
+        //             break;
+        //         }
+        //     }
+        //     _emaLine = [.. _emaLine[1..src.Length], src[firstValueIndex..(_length + firstValueIndex)].Average()];
+        //     for (int i = _length + firstValueIndex; i < src.Length; i++)
+        //     {
+        //         Next(src[i]);
+        //     }
+        // }
     }
 
     /// <summary>
@@ -54,6 +58,18 @@ public class EMA : IMath
     /// <returns></returns>
     public double Moment(double price)
     {
+        //var ema = _emaLine[^1];
+        var lastArray = _emaLine[..^_length];
+        if (lastArray.Any(_ => double.IsNaN(_)))
+        {
+            return double.NaN;
+        }
+
+        if (_emaLine.Count(_ => !double.IsNaN(_)) == _length)
+        {
+            lastArray = [.. lastArray[1.._length], price];
+            return lastArray.Average();
+        }
         var ema = _emaLine[^1];
         return price * k + ema * (1 - k);
     }
@@ -66,5 +82,4 @@ public class EMA : IMath
     }
 
     public double[] GetLines() => [.. _emaLine];
-    public double FirstNotNaN => _emaLine.Where(_ => !double.IsNaN(_)).FirstOrDefault();
 }
