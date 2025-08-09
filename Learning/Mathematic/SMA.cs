@@ -9,7 +9,14 @@ public class SMA
 
     public SMA(double[] prices, int length)
     {
-        _prices = prices[^length..];
+        if (prices.Length < length)
+        {
+            _prices = [.. prices];
+        }
+        else
+        {
+            _prices = prices[^length..];
+        }
     }
 
     public double Moment(double price)

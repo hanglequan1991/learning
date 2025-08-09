@@ -6,7 +6,14 @@ public class MIN : IMath
 
     public MIN(double[] prices, int length)
     {
-        _prices = prices[^length..];
+        if (prices.Length < length)
+        {
+            _prices = [.. prices];
+        }
+        else
+        {
+            _prices = prices[^length..];
+        }
     }
 
     public double Moment(double price)

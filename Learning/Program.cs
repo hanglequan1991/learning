@@ -13,9 +13,6 @@ internal class Program
     {
         try
         {
-            var klineDataAccess = new KlineDataAccess();
-            var klineTableDef = new TableDefinitionRecord("BTCUSDT", KlineInterval.FiveMinutes);
-
             var SocketClient = new BinanceSocketClient(options =>
             {
                 options.Environment = Binance.Net.BinanceEnvironment.Live;
@@ -26,7 +23,7 @@ internal class Program
                 options.Environment = Binance.Net.BinanceEnvironment.Live;
             });
 
-            var klines = await restClient.UsdFuturesApi.ExchangeData.GetKlinesAsync("BTCUSDT", KlineInterval.FiveMinutes);
+            var klines = await restClient.UsdFuturesApi.ExchangeData.GetKlinesAsync("BTCUSDT", KlineInterval.OneHour);
             var length = 200;
             var closedPrices = klines.Data.Where(x => x.CloseTime < DateTime.UtcNow).Select(x => (double)x.ClosePrice).ToArray();
             var sma = new SMA(closedPrices, length);
@@ -35,7 +32,7 @@ internal class Program
             var min = new MIN(closedPrices, length);
             var max = new MAX(closedPrices, length);
             var rsi = new RSI(closedPrices, 14);
-            await SocketClient.UsdFuturesApi.ExchangeData.SubscribeToKlineUpdatesAsync("BTCUSDT", KlineInterval.FiveMinutes, (stream) =>
+            await SocketClient.UsdFuturesApi.ExchangeData.SubscribeToKlineUpdatesAsync("BTCUSDT", KlineInterval.OneHour, (stream) =>
             {
                 try
                 {

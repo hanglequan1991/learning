@@ -1,13 +1,20 @@
 using System.Linq;
 namespace Learning.Mathematic;
 
-public class MAX: IMath
+public class MAX : IMath
 {
     private double[] _prices;
 
     public MAX(double[] prices, int length)
     {
-        _prices = prices[^length..];
+        if (prices.Length > length)
+        {
+            _prices = prices[^length..];
+        }
+        else
+        {
+            _prices = [.. prices];
+        }
     }
 
     public double Moment(double price)
