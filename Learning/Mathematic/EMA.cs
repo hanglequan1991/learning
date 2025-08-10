@@ -44,11 +44,11 @@ public class EMA : IMath
 
         if (_emaLine.Count(_ => !double.IsNaN(_)) == _length - 1)
         {
-            double[] averageArray = [.. lastArray, price];
-            return averageArray.Average();
+            return (lastArray.Sum() + price) / (lastArray.Length + 1);
         }
+
         var ema = _emaLine[^1];
-        return price * k + ema * (1 - k);
+        return (price * k) + (ema * (1 - k));
     }
 
     public double Next(double price)
